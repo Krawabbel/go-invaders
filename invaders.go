@@ -39,7 +39,7 @@ func main() {
 	panic(Run(os.Args[1]))
 }
 
-func Run(path string) error {
+func Run(data_path string) error {
 
 	eventc := make(chan sdl.Event)
 	defer close(eventc)
@@ -61,9 +61,9 @@ func Run(path string) error {
 
 	go inputHandler(port_0_channel, port_1_channel, port_2_channel, eventc)
 
-	go sdlDriver(filepath.Join(path, "sound"), eventc, screenc, soundc)
+	go sdlDriver(data_path, eventc, screenc, soundc)
 
-	emulate(filepath.Join(path, "roms"), screenc, soundc, port_0_channel, port_1_channel, port_2_channel)
+	emulate(data_path, screenc, soundc, port_0_channel, port_1_channel, port_2_channel)
 
 	return nil // unreachable
 }
@@ -156,9 +156,9 @@ func playSoundEffect(soundc chan<- int, sounds_playing []bool, sound_id int, sou
 	return sounds_playing
 }
 
-func emulate(path string, screenc chan<- [][]bool, soundc chan<- int, port_0_channel, port_1_channel, port_2_channel <-chan byte) {
+func emulate(data_path string, screenc chan<- [][]bool, soundc chan<- int, port_0_channel, port_1_channel, port_2_channel <-chan byte) {
 
-	bus := newArcadeBus(path)
+	bus := newArcadeBus(data_path)
 
 	i8080 := intel8080.NewIntel8080(bus, 0)
 
@@ -348,15 +348,15 @@ func buffer_frame(bus intel8080.Bus) [][]bool {
 	return screen
 }
 
-func makeChunk(sound_path, name string) *mix.Chunk {
-	chunk, err := mix.LoadWAV(filepath.Join(sound_path, name))
+func makeChunk(data_path, name string) *mix.Chunk {
+	chunk, err := mix.LoadWAV(filepath.Join(data_path, name))
 	if err != nil {
 		panic(err)
 	}
 	return chunk
 }
 
-func sdlDriver(sound_path string, eventc chan<- sdl.Event, screenc <-chan [][]bool, soundc <-chan int) {
+func sdlDriver(data_path string, eventc chan<- sdl.Event, screenc <-chan [][]bool, soundc <-chan int) {
 
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
@@ -380,15 +380,15 @@ func sdlDriver(sound_path string, eventc chan<- sdl.Event, screenc <-chan [][]bo
 	}
 
 	chunks := make([]*mix.Chunk, SOUND_SIZE)
-	chunks[SOUND_SHOOT] = makeChunk(sound_path, "shoot.wav")
-	chunks[SOUND_INVADER_DEATH] = makeChunk(sound_path, "invaderkilled.wav")
-	chunks[SOUND_EXPLOSION] = makeChunk(sound_path, "explosion.wav")
-	chunks[SOUND_FLEET_MOVEMENT_1] = makeChunk(sound_path, "fastinvader1.wav")
-	chunks[SOUND_FLEET_MOVEMENT_2] = makeChunk(sound_path, "fastinvader2.wav")
-	chunks[SOUND_FLEET_MOVEMENT_3] = makeChunk(sound_path, "fastinvader3.wav")
-	chunks[SOUND_FLEET_MOVEMENT_4] = makeChunk(sound_path, "fastinvader4.wav")
-	chunks[SOUND_UFO_PASSING] = makeChunk(sound_path, "ufo_lowpitch.wav")
-	chunks[SOUND_UFO_HIT] = makeChunk(sound_path, "ufo_highpitch.wav")
+	chunks[SOUND_SHOOT] = makeChunk(data_path, "shoot.wav")
+	chunks[SOUND_INVADER_DEATH] = makeChunk(data_path, "invaderkilled.wav")
+	chunks[SOUND_EXPLOSION] = makeChunk(data_path, "explosion.wav")
+	chunks[SOUND_FLEET_MOVEMENT_1] = makeChunk(data_path, "fastinvader1.wav")
+	chunks[SOUND_FLEET_MOVEMENT_2] = makeChunk(data_path, "fastinvader2.wav")
+	chunks[SOUND_FLEET_MOVEMENT_3] = makeChunk(data_path, "fastinvader3.wav")
+	chunks[SOUND_FLEET_MOVEMENT_4] = makeChunk(data_path, "fastinvader4.wav")
+	chunks[SOUND_UFO_PASSING] = makeChunk(data_path, "ufo_lowpitch.wav")
+	chunks[SOUND_UFO_HIT] = makeChunk(data_path, "ufo_highpitch.wav")
 
 	for _, chunk := range chunks {
 		defer chunk.Free()
