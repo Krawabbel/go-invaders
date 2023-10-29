@@ -1,7 +1,6 @@
 # go-invaders
-a Space Invaders arcade emulator written in Go (Golang) 
+a (quick'n dirty) Space Invaders arcade emulator written in Go (Golang) 
 
-[![Go](https://github.com/Krawabbel/go-invaders/actions/workflows/go.yml/badge.svg)](https://github.com/Krawabbel/go-invaders/actions/workflows/go.yml)
+The ```data``` directory needs to manually be filled with the necessary rom and sound files.
 
-[![Go Coverage](https://github.com/Krawabbel/go-invaders/wiki/coverage.svg)](https://raw.githack.com/wiki/Krawabbel/go-invaders/coverage.html)
 
